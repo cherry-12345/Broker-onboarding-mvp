@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  BROKER
+  ADMIN
+}
+
+enum EntityType {
+  EXPORTER
+  IMPORTER
+}
+
+model User {
+  id         String     @id @default(uuid())
+  fullName   String     @map("full_name")
+  email      String     @unique
+  password   String
+  role       Role       @default(BROKER)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  customers  Customer[]
+
+  @@map("users")
+}
+
+model Customer {
+  id         String     @id @default(uuid())
+  brokerId   String     @map("broker_id")
+  fullName   String     @map("full_name")
+  email      String
+  gstin      String
+  entityType EntityType @map("entity_type")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  broker     User       @relation(fields: [brokerId], references: [id], onDelete: Cascade)
+
+  @@unique([brokerId, gstin])
+  @@index([gstin])
+  @@map("customers")
+}
