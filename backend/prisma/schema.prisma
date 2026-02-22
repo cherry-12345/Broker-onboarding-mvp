@@ -7,11 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  BROKER
-  ADMIN
-}
-
 enum EntityType {
   EXPORTER
   IMPORTER
@@ -22,7 +17,6 @@ model User {
   fullName   String     @map("full_name")
   email      String     @unique
   password   String
-  role       Role       @default(BROKER)
   createdAt  DateTime   @default(now()) @map("created_at")
   customers  Customer[]
 
@@ -40,6 +34,5 @@ model Customer {
   broker     User       @relation(fields: [brokerId], references: [id], onDelete: Cascade)
 
   @@unique([brokerId, gstin])
-  @@index([gstin])
   @@map("customers")
 }

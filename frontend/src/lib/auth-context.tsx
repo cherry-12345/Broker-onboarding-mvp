@@ -8,7 +8,6 @@ interface User {
   id: string;
   fullName: string;
   email: string;
-  role: 'BROKER' | 'ADMIN';
 }
 
 interface AuthContextType {

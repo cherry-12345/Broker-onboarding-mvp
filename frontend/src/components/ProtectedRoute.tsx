@@ -6,26 +6,17 @@ import { useAuth } from '@/lib/auth-context';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'BROKER' | 'ADMIN';
 }
 
-export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (!user) {
-        router.push('/login');
-      } else if (requiredRole && user.role !== requiredRole) {
-        if (user.role === 'ADMIN') {
-          router.push('/admin');
-        } else {
-          router.push('/dashboard');
-        }
-      }
+    if (!isLoading && !user) {
+      router.push('/login');
     }
-  }, [user, isLoading, requiredRole, router]);
+  }, [user, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -36,8 +27,6 @@ export default function ProtectedRoute({ children, requiredRole }: ProtectedRout
   }
 
   if (!user) return null;
-
-  if (requiredRole && user.role !== requiredRole) return null;
 
   return <>{children}</>;
 }

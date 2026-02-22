@@ -8,7 +8,7 @@
 
 ## Overview
 
-A full-stack Customer Onboarding Workflow MVP for customs brokers to register, authenticate, and onboard exporter/importer clients. Includes a broker dashboard and an admin overview dashboard.
+A full-stack Customer Onboarding Workflow MVP for customs brokers to register, authenticate, and onboard exporter/importer clients with a broker dashboard.
 
 ---
 
@@ -43,7 +43,6 @@ A full-stack Customer Onboarding Workflow MVP for customs brokers to register, a
 | full_name  | String    | Required             |
 | email      | String    | Unique, Required     |
 | password   | String    | bcrypt hash          |
-| role       | Enum      | BROKER / ADMIN       |
 | created_at | DateTime  | Auto-generated       |
 
 ### Customers Table
@@ -67,7 +66,7 @@ A full-stack Customer Onboarding Workflow MVP for customs brokers to register, a
 |--------------------------|-----------------------------------------|
 | Password Hashing         | bcrypt with 10 salt rounds              |
 | Authentication           | JWT tokens (7-day expiry)               |
-| Authorization            | Role-based middleware (BROKER/ADMIN)    |
+| Authorization            | JWT auth middleware                      |
 | Input Validation         | Server: express-validator, Client: Zod  |
 | Rate Limiting            | 20 requests/15 min on auth routes       |
 | HTTP Headers             | Helmet for secure headers               |
@@ -86,9 +85,6 @@ A full-stack Customer Onboarding Workflow MVP for customs brokers to register, a
 | POST   | /auth/login        | Public   | Login and receive JWT         |
 | GET    | /customers/stats   | Bearer   | Dashboard statistics          |
 | POST   | /customers         | Bearer   | Onboard a new customer        |
-| GET    | /admin/stats       | Admin    | Platform-wide statistics      |
-| GET    | /admin/brokers     | Admin    | List all brokers              |
-| GET    | /admin/customers   | Admin    | List all customers            |
 
 ---
 
@@ -101,7 +97,6 @@ A full-stack Customer Onboarding Workflow MVP for customs brokers to register, a
 | /login                  | Public   | Login form                 |
 | /dashboard              | Broker   | Dashboard with profile view and stats |
 | /dashboard/onboard      | Broker   | Exporter/Importer registration form |
-| /admin                  | Admin    | Admin overview dashboard   |
 
 ---
 
@@ -172,11 +167,8 @@ npm install
 # Generate Prisma client
 npx prisma generate
 
-# Run database migrations
-npx prisma migrate dev --name init
-
-# Seed admin user
-npm run prisma:seed
+# Push schema to database
+npx prisma db push
 
 # Start development server
 npm run dev
@@ -198,11 +190,6 @@ npm run dev
 
 Frontend runs on `http://localhost:3000`.
 
-### Default Admin Credentials
-
-- **Email:** admin@neximprove.com
-- **Password:** Admin@123
-
 ---
 
 ## Features
@@ -211,7 +198,6 @@ Frontend runs on `http://localhost:3000`.
 - **Secure Login** — JWT-based authentication with 7-day token expiry
 - **Customer Onboarding** — GSTIN validation, entity type selection, duplicate prevention
 - **Broker Dashboard** — Profile summary, stats cards (total, exporters, importers), recent customers table
-- **Admin Dashboard (Bonus)** — Platform-wide overview, broker list with customer counts, all customers view
 - **Responsive Design** — Mobile (375px) to Desktop (1440px) with collapsible sidebar
 - **Error Handling** — Loading states, validation errors, API errors, empty states, success feedback
 
@@ -223,18 +209,16 @@ Frontend runs on `http://localhost:3000`.
 ├── backend/
 │   ├── prisma/
 │   │   ├── schema.prisma          # Database schema
-│   │   └── seed.ts                # Admin user seeder
 │   ├── src/
 │   │   ├── config/
 │   │   │   ├── database.ts        # Prisma client
 │   │   │   └── env.ts             # Environment config
 │   │   ├── middleware/
-│   │   │   ├── auth.ts            # JWT auth + admin middleware
+│   │   │   ├── auth.ts            # JWT auth middleware
 │   │   │   └── validators.ts      # Input validation rules
 │   │   ├── routes/
 │   │   │   ├── auth.ts            # Register, Login
-│   │   │   ├── customers.ts       # Create + Stats
-│   │   │   └── admin.ts           # Admin overview
+│   │   │   └── customers.ts       # Create + Stats
 │   │   └── index.ts               # Express app entry point
 │   ├── .env
 │   ├── package.json
@@ -243,9 +227,6 @@ Frontend runs on `http://localhost:3000`.
 ├── frontend/
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── admin/
-│   │   │   │   ├── layout.tsx     # Admin layout with top bar
-│   │   │   │   └── page.tsx       # Admin dashboard
 │   │   │   ├── dashboard/
 │   │   │   │   ├── onboard/
 │   │   │   │   │   └── page.tsx   # Onboarding form

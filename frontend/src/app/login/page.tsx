@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -17,7 +17,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { login, user } = useAuth();
+  const { login, user, isLoading } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,10 +30,21 @@ export default function LoginPage() {
   });
 
   // Redirect if already logged in
-  if (user) {
-    router.push(user.role === 'ADMIN' ? '/admin' : '/dashboard');
-    return null;
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [user, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
   }
+
+  if (user) return null;
 
   const onSubmit = async (data: LoginForm) => {
     setIsSubmitting(true);
@@ -112,12 +123,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <p className="text-xs font-medium text-gray-500 mb-2">Demo Admin Credentials:</p>
-            <p className="text-xs text-gray-600">Email: admin@neximprove.com</p>
-            <p className="text-xs text-gray-600">Password: Admin@123</p>
-          </div>
 
           <p className="text-center text-sm text-gray-600 mt-6">
             Don&apos;t have an account?{' '}

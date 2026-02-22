@@ -36,7 +36,6 @@ router.post('/register', registerValidation, async (req: AuthRequest, res: Respo
         fullName,
         email,
         password: hashedPassword,
-        role: 'BROKER',
       },
     });
 
@@ -46,7 +45,6 @@ router.post('/register', registerValidation, async (req: AuthRequest, res: Respo
         id: user.id,
         fullName: user.fullName,
         email: user.email,
-        role: user.role,
       },
     });
   } catch (error) {
@@ -82,7 +80,7 @@ router.post('/login', loginValidation, async (req: AuthRequest, res: Response): 
 
     // Generate JWT
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
+      { userId: user.id, email: user.email },
       config.jwtSecret as Secret,
       { expiresIn: config.jwtExpiresIn } as SignOptions
     );
@@ -94,7 +92,6 @@ router.post('/login', loginValidation, async (req: AuthRequest, res: Response): 
         id: user.id,
         fullName: user.fullName,
         email: user.email,
-        role: user.role,
       },
     });
   } catch (error) {

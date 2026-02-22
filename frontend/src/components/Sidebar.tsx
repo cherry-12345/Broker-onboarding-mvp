@@ -8,6 +8,7 @@ import {
   HomeIcon,
   UserPlusIcon,
   ArrowRightOnRectangleIcon,
+  ShieldCheckIcon,
 } from './Icons';
 
 export default function Sidebar() {
@@ -23,6 +24,7 @@ export default function Sidebar() {
   const brokerLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: <HomeIcon /> },
     { href: '/dashboard/onboard', label: 'Onboard Customer', icon: <UserPlusIcon /> },
+    { href: '/dashboard/admin', label: 'Admin', icon: <ShieldCheckIcon /> },
   ];
 
   return (
